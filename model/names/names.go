@@ -8,9 +8,17 @@ import (
 )
 
 type Name struct {
-	Id         int
-	Familyname string // Фамилия актёра
-	Givenname  string // Имя актёра
+	id         int
+	familyname string // Фамилия актёра
+	givenname  string // Имя актёра
+}
+
+func Create(id int, s1 string, s2 string) Name {
+	return Name{
+		id:         id,
+		familyname: s1,
+		givenname:  s2,
+	}
 }
 
 func CheckName(s1 string, s2 string) bool {
@@ -42,7 +50,7 @@ func CheckName(s1 string, s2 string) bool {
 	return b
 }
 
-func Insert(s1 string, s2 string) {
+func Insert(n Name) {
 	connStr := "user=postgres password=password dbname=actorsdb sslmode=disable"
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
@@ -53,7 +61,7 @@ func Insert(s1 string, s2 string) {
 	result, err := db.Exec(`
 	INSERT INTO Names (Id, Family, Given)
 	VALUES  ((SELECT COALESCE(MAX(Id), 0) + 1 FROM  Names), $1, $2);
-		 `, s1, s2)
+		 `, n.familyname, n.givenname)
 	if err != nil {
 		panic(err)
 	}
@@ -61,7 +69,7 @@ func Insert(s1 string, s2 string) {
 	result.RowsAffected()
 }
 
-func DeleteNames(s1 string, s2 string) {
+func DeleteNames(n Name) {
 	connStr := "user=postgres password=password dbname=actorsdb sslmode=disable"
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
@@ -72,7 +80,7 @@ func DeleteNames(s1 string, s2 string) {
 	result, err := db.Exec(`
 	DELETE FROM Names
 	WHERE ((Family LIKE $1) AND (Given LIKE $2));
-	`, s1, s2)
+	`, n.familyname, n.givenname)
 	if err != nil {
 		panic(err)
 	}
@@ -80,7 +88,7 @@ func DeleteNames(s1 string, s2 string) {
 	result.RowsAffected()
 }
 
-func Delete(id int) {
+func DeleteByID(id int) {
 	connStr := "user=postgres password=password dbname=actorsdb sslmode=disable"
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
@@ -99,7 +107,7 @@ func Delete(id int) {
 	result.RowsAffected()
 }
 
-func Select(id int) Name {
+func SelectByID(id int) Name {
 	connStr := "user=postgres password=password dbname=actorsdb sslmode=disable"
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
@@ -119,21 +127,30 @@ func Select(id int) Name {
 	names := []Name{}
 	for rows.Next() {
 		n := Name{}
-		err = rows.Scan(&n.Familyname, &n.Givenname)
+		err = rows.Scan(&n.familyname, &n.givenname)
 		if err != nil {
 			fmt.Println(err)
 			continue
 		}
 		names = append(names, n)
 
-		fmt.Print(names[0].Familyname, names[0].Givenname)
+		fmt.Print(names[0].familyname, names[0].givenname)
 
-		name = Name{Familyname: names[0].Familyname, Givenname: names[0].Givenname}
+		name = Name{familyname: names[0].familyname, givenname: names[0].givenname}
 	}
 	return name
 }
 
 func GetIDs(s1 string, s2 string) []int {
+	s := ""
+	if s1 == "" {
+		s = "SELECT id FROM Names WHERE Given LIKE $2;"
+	} else if s2 == "" {
+		s = "SELECT id FROM Names WHERE Family LIKE $1;"
+	} else {
+		s = "SELECT id FROM Names WHERE ((Family LIKE $1) AND (Given LIKE $2));"
+	}
+
 	connStr := "user=postgres password=password dbname=actorsdb sslmode=disable"
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
@@ -141,10 +158,7 @@ func GetIDs(s1 string, s2 string) []int {
 	}
 	defer db.Close()
 
-	rows, err := db.Query(`
-	SELECT id FROM Names
-	WHERE ((Family LIKE $1) AND (Given LIKE $2));
-	`, s1, s2)
+	rows, err := db.Query(s, s1, s2)
 	if err != nil {
 		panic(err)
 	}
@@ -182,13 +196,13 @@ func PrintNames() {
 	names := []Name{}
 	for rows.Next() {
 		n := Name{}
-		err = rows.Scan(&n.Id, &n.Familyname, &n.Givenname)
+		err = rows.Scan(&n.id, &n.familyname, &n.givenname)
 		if err != nil {
 			fmt.Println(err)
 			continue
 		}
 		names = append(names, n)
-		fmt.Println(names[i].Id, "|", names[i].Familyname, "|", names[i].Givenname)
+		fmt.Println(names[i].id, "|", names[i].familyname, "|", names[i].givenname)
 		i++
 	}
 }
