@@ -8,11 +8,6 @@ import (
 
 var lastid int
 
-type Nation struct {
-	Id   int
-	Name string
-}
-
 type Displayed struct { //Сущность, которая будет выводиться в конце
 	Id         int
 	Familyname string  // Фамилия актёра
@@ -31,7 +26,7 @@ func PrintDisplayed() {
 	defer db.Close()
 
 	rows, err := db.Query(`
-		SELECT Actors.id, Names.Family AS "Family name", Names.Given AS "Given name", Nations.Name AS "Nation", Number, Honorar  FROM Actors 
+		SELECT Actors.id, Names.Family, Names.Given, Nations.Name, Number, Honorar FROM Actors 
 		JOIN Names ON Actors.Nameid=Names.id
 		JOIN Nations ON Actors.Nationid=Nations.id
 		`)

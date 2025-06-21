@@ -1,11 +1,11 @@
 package main
 
 import (
-	model "github.com/arry/WB_project/model"
+	"github.com/arry/WB_project/model/names"
 )
 
 func main() {
-	model.PrintDisplayed()
+	names.GetIDs("Doe", "")
 	// a := model.Displayed{
 	// 	Familyname: "Doe",
 	// 	Givenname:  "John",
