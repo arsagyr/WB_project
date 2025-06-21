@@ -1,6 +1,6 @@
 body {
     margin-top:40px; 
-    background-image: url("https://s2.best-wallpaper.net/wallpaper/1920x1200/1810/Space-stars-purple_1920x1200.jpg"); 
+    background-color: blueviolet; 
     background-repeat: no-repeat; 
     background-size: 100%; 
     font-family: cursive; 
@@ -39,5 +39,5 @@ legend{
 img{
     position: relative; 
     margin:  18px 20% 18px;
-    width:60%;
+    width: 60%;
 }
