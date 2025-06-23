@@ -2,6 +2,6 @@ module github.com/arry/WB_project
 
 go 1.24.4
 
-replace github.com/arry/WB_project/model/beings => ../home/arry/Documents/yorek/practice2025/WB_project/model/beings
+replace github.com/arry/WB_project/internal/model/dispayed => ../home/arry/WB_project/code/backend/internal/model/displayed
 
 require github.com/lib/pq v1.10.9

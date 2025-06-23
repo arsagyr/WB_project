@@ -16,19 +16,23 @@
 				<form name="actorForm">
 					<table>
 							<tr>
-								<td>Фамилия Имя</td>
+								<td>Фамилия</td>
 								<td>
-									<select id="names">
-									<option value="Doe John">Не указан</option>
-									</select></label>
+									<label>
+										<input type="text" name="Familyname" pattern="[A-Za-zА-Яа-яЁё]+$" required>
 								</td>
 							</tr>
-							
+								<td>Имя</td>
+								<td>
+									<label>
+										<input type="text" name="Givenname" pattern="[A-Za-zА-Яа-яЁё]+$" required>
+								</td>
 							<tr>
 								<td>Национальность</td>
 								<td>
-									<select id="nation">
+									<select name="nation">
 									<option value=" - "> - </option>
+									<option value="США">США</option>
 									</select></label>
 								</td>
 							</tr>
@@ -37,7 +41,7 @@
 								<td>Число фильмов</td>
 								<td>
 									<label>
-										<input type="tel" pattern="[0-9]{0,}">
+										<input  type="number" name="number" pattern="[0-9]{0,}" required>
 									</label>
 								</td>
 							</tr>
@@ -46,7 +50,7 @@
 								<td>Гонорар</td>
 								<td>
 									<label>
-										<input type="tel" pattern="[0-9]{0,}">
+										<input type="number" step="0.0001" name="honorar" pattern="[0-9]{0,}" required>
 									</label>
 								</td>
 							</tr>

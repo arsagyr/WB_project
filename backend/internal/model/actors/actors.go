@@ -11,11 +11,11 @@ import (
 // )
 
 type Actor struct {
-	id       int
-	nameid   int     // Фамилия актёра
-	nationid int16   // Национальность (гражданство)
-	number   int16   // Число фильмов
-	honorar  float32 // Суммарный гонорар
+	Id       int
+	Nameid   int    // Фамилия актёра
+	Nationid int16  // Национальность (гражданство)
+	Number   string // Число фильмов
+	Honorar  string // Суммарный гонорар
 }
 
 func SelectByID(id int) []Actor {
@@ -38,13 +38,13 @@ func SelectByID(id int) []Actor {
 	actors := []Actor{}
 	for rows.Next() {
 		a := Actor{}
-		err = rows.Scan(&a.id, &a.nameid, &a.nationid, &a.number, &a.honorar)
+		err = rows.Scan(&a.Id, &a.Nameid, &a.Nationid, &a.Number, &a.Honorar)
 		if err != nil {
 			fmt.Println(err)
 			continue
 		}
 		actors = append(actors, a)
-		fmt.Println(actors[i].id, actors[i].nameid, actors[i].nationid, actors[i].number, actors[i].honorar)
+		fmt.Println(actors[i].Id, actors[i].Nameid, actors[i].Nationid, actors[i].Number, actors[i].Honorar)
 		i++
 	}
 	return actors
@@ -60,8 +60,8 @@ func Insert(a Actor) {
 
 	result, err := db.Exec(`
 	INSERT INTO Actors (id, nameid, nationid, number, honorar)
-	VALUES  $1, $2, $3, $4, $5);
-		 `, a.id, a.nameid, a.nationid, a.number, a.honorar)
+	VALUES  ((SELECT COALESCE(MAX(Id), 0) + 1 FROM  Actors), $1, $2, $3, $4);
+		 `, a.Nameid, a.Nationid, a.Number, a.Honorar)
 	if err != nil {
 		panic(err)
 	}
@@ -107,7 +107,7 @@ func SelectAll() []Actor {
 	actors := []Actor{}
 	for rows.Next() {
 		a := Actor{}
-		err = rows.Scan(&a.id, &a.nameid, &a.nationid, &a.number, &a.honorar)
+		err = rows.Scan(&a.Id, &a.Nameid, &a.Nationid, &a.Number, &a.Honorar)
 		if err != nil {
 			fmt.Println(err)
 			continue
@@ -137,13 +137,13 @@ func PrintAll() {
 	actors := []Actor{}
 	for rows.Next() {
 		a := Actor{}
-		err = rows.Scan(&a.id, &a.nameid, &a.nationid, &a.number, &a.honorar)
+		err = rows.Scan(&a.Id, &a.Nameid, &a.Nationid, &a.Number, &a.Honorar)
 		if err != nil {
 			fmt.Println(err)
 			continue
 		}
 		actors = append(actors, a)
-		fmt.Println(actors[i].id, actors[i].nameid, actors[i].nationid, actors[i].number, actors[i].honorar)
+		fmt.Println(actors[i].Id, actors[i].Nameid, actors[i].Nationid, actors[i].Number, actors[i].Honorar)
 		i++
 	}
 }

@@ -1,4 +1,4 @@
-package model
+package names
 
 import (
 	"database/sql"
@@ -7,19 +7,21 @@ import (
 	_ "github.com/lib/pq"
 )
 
-type Nation struct {
-	id   int
-	name string
+type Name struct {
+	id         int
+	Familyname string // Фамилия актёра
+	Givenname  string // Имя актёра
 }
 
-func Create(id int, s string) Nation {
-	return Nation{
-		id:   id,
-		name: s,
+func Create(s1 string, s2 string) Name {
+	return Name{
+		id:         -1,
+		Familyname: s1,
+		Givenname:  s2,
 	}
 }
 
-func IsThere(s string) bool {
+func CheckName(s1 string, s2 string) bool {
 	connStr := "user=postgres password=password dbname=actorsdb sslmode=disable"
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
@@ -29,9 +31,10 @@ func IsThere(s string) bool {
 
 	rows, err := db.Query(`
 	SELECT EXISTS (
-	SELECT FROM Nations
-	WHERE  Name = $1);
-	`, s)
+	SELECT FROM Names
+	WHERE  Family = $1, Given = $2
+	);
+	`, s1, s2)
 	if err != nil {
 		panic(err)
 	}
@@ -47,7 +50,43 @@ func IsThere(s string) bool {
 	return b
 }
 
-func Insert(n Nation) {
+func Insert(n Name) int {
+	connStr := "user=postgres password=password dbname=actorsdb sslmode=disable"
+	db, err := sql.Open("postgres", connStr)
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
+	id := -1
+	rows, err := db.Query(`
+	SELECT COALESCE(MAX(Id), 0) + 1 FROM  Names
+	`)
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+	for rows.Next() {
+		err = rows.Scan(&id)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+	}
+
+	result, err := db.Exec(`
+	INSERT INTO Names (Id, Family, Given)
+	VALUES ($1, $2, $3 );
+		 `, id, n.Familyname, n.Givenname)
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+	result.RowsAffected()
+	return id
+}
+
+func DeleteNames(n Name) {
 	connStr := "user=postgres password=password dbname=actorsdb sslmode=disable"
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
@@ -56,9 +95,9 @@ func Insert(n Nation) {
 	defer db.Close()
 
 	result, err := db.Exec(`
-	INSERT INTO Nations (id, name)
-	VALUES  $1, $2);
-		 `, n.id, n.name)
+	DELETE FROM Names
+	WHERE ((Family LIKE $1) AND (Given LIKE $2));
+	`, n.Familyname, n.Givenname)
 	if err != nil {
 		panic(err)
 	}
@@ -75,7 +114,7 @@ func DeleteByID(id int) {
 	defer db.Close()
 
 	result, err := db.Exec(`
-	DELETE FROM Nations
+	DELETE FROM Names
 	WHERE id = $1;
 	`, id)
 	if err != nil {
@@ -85,7 +124,7 @@ func DeleteByID(id int) {
 	result.RowsAffected()
 }
 
-func SelectByID(id int) Nation {
+func SelectByID(id int) Name {
 	connStr := "user=postgres password=password dbname=actorsdb sslmode=disable"
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
@@ -101,22 +140,26 @@ func SelectByID(id int) Nation {
 		panic(err)
 	}
 	defer rows.Close()
-	nation := Nation{}
-	nations := []Nation{}
+	name := Name{}
+	names := []Name{}
 	for rows.Next() {
-		n := Nation{}
-		err = rows.Scan(&n.id, &n.name)
+		n := Name{}
+		err = rows.Scan(&n.Familyname, &n.Givenname)
 		if err != nil {
 			fmt.Println(err)
 			continue
 		}
-		nations = append(nations, n)
-		nation = Nation{id: nations[0].id, name: nations[0].name}
+		names = append(names, n)
+		name = Name{Familyname: names[0].Familyname, Givenname: names[0].Givenname}
 	}
-	return nation
+	return name
 }
 
 func GetIDs(s1 string, s2 string) []int {
+	if (s1 == "") && (s2 == "") {
+		panic("Empty input")
+	}
+
 	s := ""
 	if (s1 == "") || (s2 == "") {
 		s = "SELECT id FROM Names WHERE ((Family LIKE $1) OR (Given LIKE $2));"
@@ -150,7 +193,7 @@ func GetIDs(s1 string, s2 string) []int {
 	return ids
 }
 
-func SelectAll() []Nation {
+func SelectAll() []Name {
 	connStr := "user=postgres password=password dbname=actorsdb sslmode=disable"
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
@@ -159,23 +202,23 @@ func SelectAll() []Nation {
 	defer db.Close()
 
 	rows, err := db.Query(`
-	SELECT * FROM Nations
+	SELECT * FROM Names
 	`)
 	if err != nil {
 		panic(err)
 	}
 	defer rows.Close()
-	nations := []Nation{}
+	names := []Name{}
 	for rows.Next() {
-		n := Nation{}
-		err = rows.Scan(&n.id, &n.name)
+		n := Name{}
+		err = rows.Scan(&n.id, &n.Familyname, &n.Givenname)
 		if err != nil {
 			fmt.Println(err)
 			continue
 		}
-		nations = append(nations, n)
+		names = append(names, n)
 	}
-	return nations
+	return names
 }
 
 func PrintAll() {
@@ -194,16 +237,16 @@ func PrintAll() {
 	}
 	defer rows.Close()
 	i := 0
-	nations := []Nation{}
+	names := []Name{}
 	for rows.Next() {
-		n := Nation{}
-		err = rows.Scan(&n.id, &n.name)
+		n := Name{}
+		err = rows.Scan(&n.id, &n.Familyname, &n.Givenname)
 		if err != nil {
 			fmt.Println(err)
 			continue
 		}
-		nations = append(nations, n)
-		fmt.Println(nations[i].id, "|", nations[i].name)
+		names = append(names, n)
+		fmt.Println(names[i].id, "|", names[i].Familyname, "|", names[i].Givenname)
 		i++
 	}
 }
