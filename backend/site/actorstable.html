@@ -10,6 +10,12 @@
    <form action="#"> 
 	<fieldset>
 	<legend>Таблица актёров</legend>
+	<table>	<br>
+		<tr>
+			<td><button type="button" onclick=" ">Найти актёра</button></td>
+			<td><button type="button" onclick=" ">Добавить актёра</button></td>
+		</tr>
+	</table>
 	<table border=2>
 		<thead><th>ID</th><th>Фамилия</th><th>Имя</th><th>Национальность</th><th>Количество фильмов</th><th>Гонорар в млн. $</th></thead>
 		{{range . }}
@@ -22,11 +28,6 @@
 			<td  class="displayed">{{.Honorar}}</td>
 		</tr>
 		{{end}}
-	</table>
-	<table>	<br>
-		<tr>
-			<td><button type="button" onclick=" ">Добавить актёра</button></td>
-		</tr>
 	</table>
 	</fieldset>
 	</form>

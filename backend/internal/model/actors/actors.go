@@ -5,11 +5,6 @@ import (
 	"fmt"
 )
 
-// import (
-// 	"database/sql"
-// 	"fmt"
-// )
-
 type Actor struct {
 	Id       int
 	Nameid   int    // Фамилия актёра
@@ -18,7 +13,7 @@ type Actor struct {
 	Honorar  string // Суммарный гонорар
 }
 
-func SelectByID(id int) []Actor {
+func SelectByID(id int) Actor {
 	connStr := "user=postgres password=password dbname=actorsdb sslmode=disable"
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
@@ -27,14 +22,13 @@ func SelectByID(id int) []Actor {
 	defer db.Close()
 
 	rows, err := db.Query(`
-	SELECT Family, Given FROM Actors
+	SELECT * FROM Actors
 	WHERE id=$1;
 	`, id)
 	if err != nil {
 		panic(err)
 	}
 	defer rows.Close()
-	i := 0
 	actors := []Actor{}
 	for rows.Next() {
 		a := Actor{}
@@ -44,10 +38,8 @@ func SelectByID(id int) []Actor {
 			continue
 		}
 		actors = append(actors, a)
-		fmt.Println(actors[i].Id, actors[i].Nameid, actors[i].Nationid, actors[i].Number, actors[i].Honorar)
-		i++
 	}
-	return actors
+	return actors[0]
 }
 
 func Insert(a Actor) {
@@ -146,4 +138,33 @@ func PrintAll() {
 		fmt.Println(actors[i].Id, actors[i].Nameid, actors[i].Nationid, actors[i].Number, actors[i].Honorar)
 		i++
 	}
+}
+
+func GetNameidByID(id int) int {
+	connStr := "user=postgres password=password dbname=actorsdb sslmode=disable"
+	db, err := sql.Open("postgres", connStr)
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+
+	rows, err := db.Query(`
+	SELECT Nameid FROM Actors
+	WHERE id=$1;
+	`, id)
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+	var n []int
+	for rows.Next() {
+		var nn int
+		err = rows.Scan(&nn)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+		n = append(n, nn)
+	}
+	return n[0]
 }

@@ -6,13 +6,8 @@ import (
 
 	// names "github.com/arry/WB_project/model/names"
 
-	"github.com/arry/WB_project/internal/model/actors"
-	"github.com/arry/WB_project/internal/model/names"
-	Nation "github.com/arry/WB_project/internal/model/nation"
 	_ "github.com/lib/pq"
 )
-
-var lastid int
 
 type Displayed struct { //Сущность, которая будет выводиться в конце
 	Id         int
@@ -88,19 +83,46 @@ func GetDisplayed() []Displayed {
 }
 
 func Insert(d Displayed) {
-	n := names.Name{
-		Familyname: d.Familyname,
-		Givenname:  d.Givenname,
+	connStr := "user=postgres password=password dbname=actorsdb sslmode=disable"
+	db, err := sql.Open("postgres", connStr)
+	if err != nil {
+		panic(err)
 	}
-	nameid := names.Insert(n)
-	nationid := Nation.GetID(d.Nation)
-	a := actors.Actor{
-		Nameid:   nameid,
-		Nationid: nationid,
-		Number:   d.Number,
-		Honorar:  d.Honorar,
+	defer db.Close()
+
+	nameid := -1
+	rows, err := db.Query(`
+	SELECT COALESCE(MAX(Id), 0) + 1 FROM  Names
+	`)
+	if err != nil {
+		panic(err)
 	}
-	actors.Insert(a)
+	defer rows.Close()
+	for rows.Next() {
+		err = rows.Scan(&nameid)
+		if err != nil {
+			fmt.Println(err)
+			continue
+		}
+	}
+	result, err := db.Exec(`
+	INSERT INTO Names (Id, Family, Given)
+	VALUES ($1, $2, $3 );
+		 `, nameid, d.Familyname, d.Givenname)
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+	result.RowsAffected()
+	result, err = db.Exec(`
+	INSERT INTO Actors (id, nameid, nationid, number, honorar)
+	VALUES  ((SELECT COALESCE(MAX(Id), 0) + 1 FROM  Actors), (SELECT id FROM Nations WHERE Name LIKE $1), $2, $3, $4);
+		 `, nameid, d.Nation, d.Number, d.Honorar)
+	if err != nil {
+		panic(err)
+	}
+	defer db.Close()
+	result.RowsAffected()
 }
 
 func Search(s1 string, s2 string, s3 string) []Displayed {
@@ -147,6 +169,57 @@ func Search(s1 string, s2 string, s3 string) []Displayed {
 	return actors
 }
 
-func DeleteDisplayed() {
+func DeleteDisplayed(id int) {
+	if id == -1 {
+		fmt.Println("Wrong input")
+	} else {
+		connStr := "user=postgres password=password dbname=actorsdb sslmode=disable"
+		db, err := sql.Open("postgres", connStr)
+		if err != nil {
+			panic(err)
+		}
+		defer db.Close()
+		rows, err := db.Query(`
+		SELECT Nameid FROM Actors
+		WHERE id=$1;
+		`, id)
+		if err != nil {
+			panic(err)
+		}
+		defer rows.Close()
+		var n []int
+		for rows.Next() {
+			var nn int
+			err = rows.Scan(&nn)
+			if err != nil {
+				fmt.Println(err)
+				continue
+			}
+			n = append(n, nn)
+		}
+		if len(n) == 0 {
 
+			fmt.Println("Nothing to delete: there is not the actor")
+		} else {
+			result, err := db.Exec(`
+			DELETE FROM Actors
+			WHERE id = $1;
+			`, id)
+			if err != nil {
+				panic(err)
+			}
+			defer db.Close()
+			result.RowsAffected()
+
+			result, err = db.Exec(`
+			DELETE FROM Names
+			WHERE id = $1;
+			`, n[0])
+			if err != nil {
+				panic(err)
+			}
+			defer db.Close()
+			result.RowsAffected()
+		}
+	}
 }

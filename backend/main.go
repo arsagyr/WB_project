@@ -6,6 +6,8 @@ import (
 	"net/http"
 
 	"github.com/arry/WB_project/internal/handlers"
+	displayed "github.com/arry/WB_project/internal/model/displayed"
+	"github.com/arry/WB_project/internal/model/names"
 	_ "github.com/lib/pq"
 )
 
@@ -24,23 +26,23 @@ func main() {
 		http.ServeFile(w, r, "site/media/nofoto.jpg")
 	})
 
+	http.HandleFunc("/", handlers.IndexHandler2)
 	http.HandleFunc("/create", handlers.CreateHandler2)
-	http.HandleFunc("/", handlers.TableHandler)
+	// router := httprouter.New()
+	// router.GET("/", handlers.ShowForm)
+	// router.POST("/submit", handlers.SubmitForm)
 
 	fmt.Println("Server is listening...")
 	http.ListenAndServe("localhost:8181", nil)
 
+	// d := displayed.Displayed{
+	// 	Familyname: "Bor",
+	// 	Givenname:  "Alex",
+	// 	Nation:     " - ",
+	// 	Honorar:    "100",
+	// 	Number:     "100",
+	// }
+
+	displayed.PrintDisplayed()
+	names.PrintAll()
 }
-
-// func main() {
-
-// 	d := displayed.Displayed{
-// 		Familyname: "Bor",
-// 		Givenname:  "Alex",
-// 		Nation:     " - ",
-// 		Honorar:    1,
-// 		Number:     1,
-// 	}
-// 	displayed.Insert(d)
-// 	displayed.PrintDisplayed()
-// }
