@@ -1,4 +1,4 @@
-package Displayed
+package Model
 
 import (
 	"database/sql"
@@ -9,7 +9,7 @@ import (
 	_ "github.com/lib/pq"
 )
 
-type Displayed struct { //Сущность, которая будет выводиться в конце
+type Actor struct { //Сущность, которая будет выводиться в конце
 	Id         int
 	Familyname string // Фамилия актёра
 	Givenname  string // Имя актёра
@@ -18,7 +18,7 @@ type Displayed struct { //Сущность, которая будет вывод
 	Honorar    string // Суммарный гонорар
 }
 
-func PrintDisplayed() {
+func PrintActor() {
 	connStr := "user=postgres password=password dbname=actorsdb sslmode=disable"
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
@@ -35,10 +35,10 @@ func PrintDisplayed() {
 		panic(err)
 	}
 	defer rows.Close()
-	actors := []Displayed{}
+	actors := []Actor{}
 
 	for rows.Next() {
-		a := Displayed{}
+		a := Actor{}
 		err := rows.Scan(&a.Id, &a.Familyname, &a.Givenname, &a.Nation, &a.Number, &a.Honorar)
 		if err != nil {
 			fmt.Println(err)
@@ -51,7 +51,7 @@ func PrintDisplayed() {
 	}
 }
 
-func GetDisplayed() []Displayed {
+func GetActor() []Actor {
 	connStr := "user=postgres password=password dbname=actorsdb sslmode=disable"
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
@@ -68,10 +68,10 @@ func GetDisplayed() []Displayed {
 		panic(err)
 	}
 	defer rows.Close()
-	actors := []Displayed{}
+	actors := []Actor{}
 
 	for rows.Next() {
-		a := Displayed{}
+		a := Actor{}
 		err := rows.Scan(&a.Id, &a.Familyname, &a.Givenname, &a.Nation, &a.Number, &a.Honorar)
 		if err != nil {
 			fmt.Println(err)
@@ -82,7 +82,7 @@ func GetDisplayed() []Displayed {
 	return actors
 }
 
-func Insert(d Displayed) {
+func Insert(d Actor) {
 	connStr := "user=postgres password=password dbname=actorsdb sslmode=disable"
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
@@ -125,7 +125,7 @@ func Insert(d Displayed) {
 	result.RowsAffected()
 }
 
-func Search(s1 string, s2 string, s3 string) []Displayed {
+func Search(s1 string, s2 string, s3 string) []Actor {
 	if (s1 == "") && (s2 == "") && (s3 == "") {
 		panic("Empty input")
 	}
@@ -154,10 +154,10 @@ func Search(s1 string, s2 string, s3 string) []Displayed {
 		panic(err)
 	}
 	defer rows.Close()
-	actors := []Displayed{}
+	actors := []Actor{}
 
 	for rows.Next() {
-		a := Displayed{}
+		a := Actor{}
 		err := rows.Scan(&a.Id, &a.Familyname, &a.Givenname, &a.Nation, &a.Number, &a.Honorar)
 		if err != nil {
 			fmt.Println(err)
@@ -169,7 +169,7 @@ func Search(s1 string, s2 string, s3 string) []Displayed {
 	return actors
 }
 
-func DeleteDisplayed(id int) {
+func DeleteActor(id int) {
 	if id == -1 {
 		fmt.Println("Wrong input")
 	} else {

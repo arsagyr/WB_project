@@ -6,8 +6,7 @@ import (
 	"net/http"
 
 	"github.com/arry/WB_project/internal/handlers"
-	displayed "github.com/arry/WB_project/internal/model/displayed"
-	"github.com/arry/WB_project/internal/model/names"
+	model "github.com/arry/WB_project/internal/model"
 	_ "github.com/lib/pq"
 )
 
@@ -18,6 +17,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+
 	defer db.Close()
 	http.HandleFunc("/css/STYLES.css", func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "site/css/STYLES.css")
@@ -26,8 +26,8 @@ func main() {
 		http.ServeFile(w, r, "site/media/nofoto.jpg")
 	})
 
-	http.HandleFunc("/", handlers.IndexHandler2)
-	http.HandleFunc("/create", handlers.CreateHandler2)
+	http.HandleFunc("/", handlers.TableHandler)
+	http.HandleFunc("/create", handlers.CreateHandler)
 	// router := httprouter.New()
 	// router.GET("/", handlers.ShowForm)
 	// router.POST("/submit", handlers.SubmitForm)
@@ -35,7 +35,7 @@ func main() {
 	fmt.Println("Server is listening...")
 	http.ListenAndServe("localhost:8181", nil)
 
-	// d := displayed.Displayed{
+	// d := model.Actor{
 	// 	Familyname: "Bor",
 	// 	Givenname:  "Alex",
 	// 	Nation:     " - ",
@@ -43,6 +43,5 @@ func main() {
 	// 	Number:     "100",
 	// }
 
-	displayed.PrintDisplayed()
-	names.PrintAll()
+	model.PrintActor()
 }

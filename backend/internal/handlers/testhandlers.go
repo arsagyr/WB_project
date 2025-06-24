@@ -7,25 +7,25 @@ import (
 	"log"
 	"net/http"
 
-	displayed "github.com/arry/WB_project/internal/model/displayed"
+	model "github.com/arry/WB_project/internal/model"
 	_ "github.com/lib/pq"
 )
 
 func CreateHandler2(w http.ResponseWriter, r *http.Request) {
-	if r.Method == "GET" {
+	if r.Method == "POST" {
 
 		err := r.ParseForm()
 		if err != nil {
 			log.Println(err)
 		}
-		d := displayed.Displayed{
+		d := model.Actor{
 			Familyname: r.FormValue("Familyname"),
 			Givenname:  r.FormValue("Givenname"),
 			Nation:     r.FormValue("Nation"),
 			Number:     r.FormValue("Number"),
 			Honorar:    r.FormValue("Honorar"),
 		}
-		displayed.Insert(d)
+		model.Insert(d)
 
 		http.Redirect(w, r, "/", 301)
 	} else {
@@ -50,10 +50,10 @@ func IndexHandler2(w http.ResponseWriter, r *http.Request) {
 	}
 	defer rows.Close()
 
-	actors := []displayed.Displayed{}
+	actors := []model.Actor{}
 
 	for rows.Next() {
-		a := displayed.Displayed{}
+		a := model.Actor{}
 		err := rows.Scan(&a.Id, &a.Familyname, &a.Givenname, &a.Nation, &a.Number, &a.Honorar)
 		if err != nil {
 			fmt.Println(err)
