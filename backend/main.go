@@ -7,7 +7,6 @@ import (
 	"log"
 	"net/http"
 
-	// model "github.com/WB_Project/model"
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
 )
@@ -64,7 +63,7 @@ func EditPage(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		http.Error(w, http.StatusText(404), http.StatusNotFound)
 	} else {
-		tmpl, _ := template.ParseFiles("templates/edit.html")
+		tmpl, _ := template.ParseFiles("internal/templates/edit.html")
 		tmpl.Execute(w, a)
 	}
 }
@@ -152,7 +151,7 @@ func CreateHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		http.Redirect(w, r, "/", 301)
 	} else {
-		http.ServeFile(w, r, "templates/create.html")
+		http.ServeFile(w, r, "internal/templates/create.html")
 	}
 }
 
@@ -181,7 +180,7 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 			actors = append(actors, a)
 		}
 
-		tmpl, _ := template.ParseFiles("templates/index.html")
+		tmpl, _ := template.ParseFiles("internal/templates/index.html")
 		tmpl.Execute(w, actors)
 	}
 }
