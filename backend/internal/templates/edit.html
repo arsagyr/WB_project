@@ -18,7 +18,10 @@
             <input type="number" name="number" value="{{.Number}}" /><br><br>
             <label>Гонорар</label><br>
             <input type="number" step="0.0001" name="honorar" value="{{.Honorar}}" /><br><br>
-            <input type="submit" value="Send" />
+            <table>
+                <tr><button type="submit">Отправить</button></tr>
+                <tr><input type="button" onclick="location.href='/';" value="Вернуться" /></tr>
+            </table>
         </form>
     </body>
 </html>
