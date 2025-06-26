@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+	<link rel="stylesheet" type="text/css" href="css/STYLES.css">
+<head>
+    <meta charset="UTF-8">
+    <title>Актёр</title>
+    <style>  
+		.btn {
+		 display: inline-block; /* Строчно-блочный элемент */
+		 background: lightgrey; /* Серый цвет фона */
+		 color: black; /* Белый цвет текста */
+		 padding: 0.5rem 1.5rem; /* Поля вокруг текста */
+		 margin: 16px;
+		 text-decoration: none; /* Убираем подчёркивание */
+		 border-radius: 3px; /* Скругляем уголки */
+		 border: 2px, black;
+		}
+	</style>
+
+</head>
+<body>
+   <form action="#"> 
+	<fieldset>
+	<legend>Таблица актёров</legend>
+	<table>	<br>
+		<tr>
+				<a href="/create" class="btn">Добавить актёра</a>
+		</tr>
+	</table>
+	<table border=2>
+		<thead><th>ID</th><th>Фамилия</th><th>Имя</th><th>Национальность</th><th>Количество фильмов</th><th>Гонорар в млн. $</th></thead>
+		{{range . }}
+		<tr>
+			<td  class="displayed">{{.Id}}</td>
+			<td  class="displayed">{{.Familyname}}</td>
+			<td  class="displayed">{{.Givenname}}</td>
+			<td  class="displayed">{{.Nation}}</td>
+			<td  class="displayed">{{.Number}}</td>
+			<td  class="displayed">{{.Honorar}}</td>
+			<td>
+				<a href="/edit/{{.Id}}">Изменить</a>|
+				<a href="/delete/{{.Id}}">Удалить</a>
+			</td>
+		</tr>
+		{{end}}
+	</table>
+	</fieldset>
+	</form>
+</body>
+</html>
