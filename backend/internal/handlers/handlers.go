@@ -61,7 +61,6 @@ func EditPage(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// получаем измененные данные и сохраняем их в БД
 func EditHandler(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {

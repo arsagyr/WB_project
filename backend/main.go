@@ -13,7 +13,7 @@ import (
 )
 
 func runServer() {
-	db, err := sql.Open("postgres", "user=postgres password=password dbname=actorsdb sslmode=disable")
+	db, err := sql.Open("postgres", "user=postgres password=password dbname=testactors sslmode=disable")
 	if err != nil {
 		log.Println(err)
 	}
@@ -30,7 +30,7 @@ func runServer() {
 	http.Handle("/", router)
 	fmt.Println("Server is listening...")
 
-	http.ListenAndServe(":8181", nil)
+	http.ListenAndServe("localhost:8181", nil)
 }
 
 func main() {
