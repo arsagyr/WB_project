@@ -1,0 +1,122 @@
+[
+  {
+    "id": 1,
+    "familyname": "Шварценеггер",
+    "givenname": "Арнольд",
+    "nation": "США",
+    "number": "86",
+    "honorar": "15"
+  },
+  {
+    "id": 2,
+    "familyname": "Стетхем",
+    "givenname": "Джейсон",
+    "nation": "Великобритания",
+    "number": "64",
+    "honorar": "5"
+  },
+  {
+    "id": 3,
+    "familyname": "Гослинг",
+    "givenname": "Райан",
+    "nation": "Канада",
+    "number": "57",
+    "honorar": "4"
+  },
+  {
+    "id": 4,
+    "familyname": "Борисов",
+    "givenname": "Юра",
+    "nation": "Россия",
+    "number": "70",
+    "honorar": "1"
+  },
+  {
+    "id": 5,
+    "familyname": "Нагиев",
+    "givenname": "Дмитрий",
+    "nation": "Россия",
+    "number": "129",
+    "honorar": "2"
+  },
+  {
+    "id": 6,
+    "familyname": "Пачино",
+    "givenname": "Аль",
+    "nation": "США",
+    "number": "211",
+    "honorar": "12"
+  },
+  {
+    "id": 7,
+    "familyname": " Янкович",
+    "givenname": "Эл",
+    "nation": "США",
+    "number": "308",
+    "honorar": "3"
+  },
+  {
+    "id": 8,
+    "familyname": "Нильсен",
+    "givenname": "Лесли ",
+    "nation": "США",
+    "number": "324",
+    "honorar": "5"
+  },
+  {
+    "id": 9,
+    "familyname": "Безруков",
+    "givenname": "Сергей ",
+    "nation": "Россия",
+    "number": "141",
+    "honorar": "1.5"
+  },
+  {
+    "id": 10,
+    "familyname": "Хабенский",
+    "givenname": "Константин ",
+    "nation": "Россия",
+    "number": "174",
+    "honorar": "2"
+  },
+  {
+    "id": 11,
+    "familyname": "Янковский",
+    "givenname": "Иван",
+    "nation": "Россия",
+    "number": "42",
+    "honorar": "1"
+  },
+  {
+    "id": 12,
+    "familyname": "Лавров",
+    "givenname": "Андрей ",
+    "nation": "Россия",
+    "number": "43",
+    "honorar": "0.7"
+  },
+  {
+    "id": 13,
+    "familyname": "Николас ",
+    "givenname": "Кейдж",
+    "nation": "США",
+    "number": "262",
+    "honorar": "1"
+  },
+  {
+    "id": 14,
+    "familyname": "Швайгер",
+    "givenname": "Тиль ",
+    "nation": "Германия",
+    "number": "132",
+    "honorar": "2"
+  },
+  {
+    "id": 15,
+    "familyname": "Рено",
+    "givenname": "Жан",
+    "nation": "Испания",
+    "number": "163",
+    "honorar": "7"
+  }
+]

@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 
-	"backend/internal/handlers"
+	"code/backend/handlers"
 
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"

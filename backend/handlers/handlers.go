@@ -7,7 +7,10 @@ import (
 	"log"
 	"net/http"
 
-	model "backend/internal/model"
+	"encoding/json"
+	"os"
+
+	model "code/backend/model"
 
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
@@ -56,11 +59,12 @@ func EditPage(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 		http.Error(w, http.StatusText(404), http.StatusNotFound)
 	} else {
-		tmpl, _ := template.ParseFiles("internal/templates/edit.html")
+		tmpl, _ := template.ParseFiles("frontend/templates/edit.html")
 		tmpl.Execute(w, a)
 	}
 }
 
+// получаем измененные данные и сохраняем их в БД
 func EditHandler(w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	if err != nil {
@@ -143,11 +147,42 @@ func CreateHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		http.Redirect(w, r, "/", 301)
 	} else {
-		http.ServeFile(w, r, "internal/templates/create.html")
+		http.ServeFile(w, r, "frontend/templates/create.html")
 	}
 }
 
+// func IndexHandler(w http.ResponseWriter, r *http.Request) {
+// 	rows, err := DB.Query(`
+// 	SELECT Actors.id, Names.Family, Names.Given, Nations.Name, Number, Honorar FROM Actors
+// 	JOIN Names ON Actors.Nameid=Names.id
+// 	JOIN Nations ON Actors.Nationid=Nations.id
+// 	`)
+// 	if err != nil {
+// 		log.Println(err)
+// 	}
+// 	defer rows.Close()
+// 	actors := []model.Actor{}
+
+// 	for rows.Next() {
+// 		a := model.Actor{}
+// 		err := rows.Scan(&a.Id, &a.Familyname, &a.Givenname, &a.Nation, &a.Number, &a.Honorar)
+// 		if err != nil {
+// 			fmt.Println(err)
+// 			continue
+// 		}
+// 		actors = append(actors, a)
+// 	}
+
+// 	tmpl, _ := template.ParseFiles("internal/templates/index.html")
+// 	tmpl.Execute(w, actors)
+// }
+
 func IndexHandler(w http.ResponseWriter, r *http.Request) {
+	CreateTable()
+	GetTable(w, r)
+}
+
+func CreateTable() {
 	rows, err := DB.Query(`
 	SELECT Actors.id, Names.Family, Names.Given, Nations.Name, Number, Honorar FROM Actors 
 	JOIN Names ON Actors.Nameid=Names.id
@@ -169,6 +204,97 @@ func IndexHandler(w http.ResponseWriter, r *http.Request) {
 		actors = append(actors, a)
 	}
 
-	tmpl, _ := template.ParseFiles("internal/templates/index.html")
+	data, err := json.MarshalIndent(actors, "", "  ")
+	if err != nil {
+		log.Println(err)
+	}
+
+	err = os.WriteFile("frontend/json/table.json", data, 0644)
+	if err != nil {
+		log.Println(err)
+	}
+}
+
+func GetTable(w http.ResponseWriter, r *http.Request) {
+	file, err := os.ReadFile("frontend/json/table.json")
+	if err != nil {
+		log.Println(err)
+	}
+
+	var actors []model.Actor
+	err = json.Unmarshal(file, &actors)
+	if err != nil {
+		panic(err)
+	}
+
+	tmpl, _ := template.ParseFiles("frontend/templates/index.html")
 	tmpl.Execute(w, actors)
+}
+
+func PostActorJSON(w http.ResponseWriter, r *http.Request) {
+	err := r.ParseForm()
+	if err != nil {
+		log.Println(err)
+	}
+
+	actor := model.Actor{
+		Familyname: r.FormValue("familyname"),
+		Givenname:  r.FormValue("givenname"),
+		Nation:     "%" + r.FormValue("nation") + "%",
+		Number:     r.FormValue("number"),
+		Honorar:    r.FormValue("honorar"),
+	}
+
+	fmt.Println(actor.Familyname, actor.Givenname, actor.Nation, actor.Number, actor.Honorar)
+
+	data, err := json.MarshalIndent(actor, "", "  ")
+	if err != nil {
+		log.Println(err)
+	}
+	err = os.WriteFile("frontend/json/actor.json", data, 0644)
+	if err != nil {
+		log.Println(err)
+	}
+}
+
+func LoadActorJSON() {
+
+	file, err := os.ReadFile("frontend/json/actor.json")
+	if err != nil {
+		log.Println(err)
+	}
+
+	var actor model.Actor
+	err = json.Unmarshal(file, &actor)
+	if err != nil {
+		log.Println(err)
+	}
+
+	_, err = DB.Exec(`
+			INSERT INTO Names (Family, Given)
+			VALUES ($1, $2);
+		`, actor.Familyname, actor.Givenname)
+	if err != nil {
+		log.Println(err)
+	}
+	row := DB.QueryRow(`
+		SELECT id FROM Nations WHERE Name LIKE $1;
+		`, actor.Nation)
+	nationid := 0
+	err = row.Scan(&nationid)
+	if err != nil {
+		log.Println(err)
+	}
+	_, err = DB.Exec(`
+			INSERT INTO Actors (nameid, nationid, number, honorar)
+ 			VALUES  (
+			(SELECT COALESCE(MAX(Id), 0) FROM  Names), 
+			$1, $2, $3
+			);
+			`, actor.Nation, actor.Number, actor.Honorar)
+
+	if err != nil {
+		log.Println(err)
+	}
+
 }
